@@ -55,9 +55,157 @@
   .screen--active { display: block; }
 
   /* =========================================================
-     Screen 1 — Player Setup (placeholder)
+     Screen 1 — Player Setup
      ========================================================= */
-  /* Filled in Task 3 */
+  .setup-container {
+    max-width: 500px;
+    margin: 40px auto;
+    text-align: center;
+  }
+
+  /* UNO oval badge */
+  .uno-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--header);
+    border: 3px solid #fff;
+    border-radius: 60px / 40px;
+    padding: 14px 36px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .uno-badge__text {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 1.5rem;
+    letter-spacing: 0.08em;
+    color: #fff;
+    text-transform: uppercase;
+  }
+
+  .setup-subtitle {
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 24px;
+    opacity: 0.8;
+  }
+
+  .player-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .player-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .player-input-wrap label {
+    font-weight: 700;
+    font-size: 0.85rem;
+    min-width: 44px;
+    color: var(--header);
+  }
+
+  .player-input-wrap input {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 1rem;
+    border: 2px solid var(--olive);
+    border-radius: 6px;
+    background: #faf8f6;
+    color: var(--text);
+    outline: none;
+    font-family: var(--font-body);
+    transition: border-color 0.15s;
+  }
+
+  .player-input-wrap input:focus {
+    border-color: var(--steel);
+    box-shadow: 0 0 0 3px rgba(140, 171, 209, 0.3);
+  }
+
+  .player-input-wrap .btn-remove {
+    background: none;
+    border: none;
+    color: var(--red);
+    font-size: 1.3rem;
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.15s;
+  }
+
+  .player-input-wrap .btn-remove:hover {
+    background: rgba(180, 45, 42, 0.1);
+  }
+
+  .player-input-wrap .btn-remove:disabled {
+    opacity: 0.2;
+    cursor: default;
+  }
+
+  .setup-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Buttons */
+  .btn {
+    padding: 12px 28px;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: background 0.15s, transform 0.1s, opacity 0.15s;
+    min-height: 44px;
+  }
+
+  .btn:active { transform: scale(0.97); }
+
+  .btn--primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn--primary:hover:not(:disabled) {
+    background: #5d8a56;
+  }
+
+  .btn--secondary {
+    background: var(--steel);
+    color: #fff;
+  }
+
+  .btn--secondary:hover:not(:disabled) {
+    background: #7a9abc;
+  }
+
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .setup-error {
+    margin-top: 16px;
+    color: var(--red);
+    font-weight: 600;
+    font-size: 0.9rem;
+    min-height: 1.4em;
+  }
 
   /* =========================================================
      Screen 2 — Scorecard (placeholder)
@@ -119,7 +267,25 @@
   <div class="container">
     <!-- Screen 1: Player Setup -->
     <div id="screen-setup" class="screen screen--active">
-      <!-- Filled in Task 3 -->
+      <div class="setup-container">
+        <!-- UNO-style oval badge -->
+        <div class="uno-badge">
+          <span class="uno-badge__text">UNO GOLF SCORER</span>
+        </div>
+
+        <p class="setup-subtitle">Enter player names</p>
+
+        <div id="player-inputs" class="player-inputs">
+          <!-- Player inputs injected by JS -->
+        </div>
+
+        <div class="setup-actions">
+          <button id="btn-add-player" class="btn btn--secondary" disabled>+ Add Player</button>
+          <button id="btn-start-game" class="btn btn--primary" disabled>Start Game</button>
+        </div>
+
+        <p id="setup-error" class="setup-error"></p>
+      </div>
     </div>
 
     <!-- Screen 2: Scorecard -->
@@ -135,8 +301,139 @@
 
   <script>
     // =========================================================
-    // App State (filled in Task 4)
+    // Game State
     // =========================================================
+    let state = {
+      players: [],
+      currentRound: 1,
+      gameActive: false
+    };
+
+    const STORAGE_KEY = 'unoGolfScorer';
+    const MAX_PLAYERS = 8;
+    const MIN_PLAYERS = 2;
+    const TOTAL_ROUNDS = 9;
+
+    // =========================================================
+    // DOM References
+    // =========================================================
+    const $ = id => document.getElementById(id);
+    const screenSetup   = $('screen-setup');
+    const screenScorecard = $('screen-scorecard');
+    const screenResults = $('screen-results');
+    const playerInputs  = $('player-inputs');
+    const btnAddPlayer  = $('btn-add-player');
+    const btnStartGame  = $('btn-start-game');
+    const setupError    = $('setup-error');
+
+    // =========================================================
+    // Player Setup
+    // =========================================================
+    let playerCount = 0;
+
+    function addPlayerInput(name) {
+      if (playerCount >= MAX_PLAYERS) return;
+      const idx = playerCount;
+      const wrap = document.createElement('div');
+      wrap.className = 'player-input-wrap';
+      wrap.dataset.index = idx;
+      wrap.innerHTML = `
+        <label for="pname-${idx}">#${idx + 1}</label>
+        <input type="text" id="pname-${idx}" class="pname-input"
+               placeholder="Player ${idx + 1}" maxlength="20"
+               value="${name || ''}" autocomplete="off">
+        <button class="btn-remove" data-index="${idx}" title="Remove player">&times;</button>
+      `;
+      playerInputs.appendChild(wrap);
+      playerCount++;
+
+      // Wire up remove
+      wrap.querySelector('.btn-remove').addEventListener('click', () => {
+        removePlayerInput(idx);
+      });
+
+      // Wire up input change to re-validate
+      wrap.querySelector('.pname-input').addEventListener('input', updateStartButton);
+
+      updateAddButton();
+      updateStartButton();
+    }
+
+    function removePlayerInput(index) {
+      const wraps = playerInputs.querySelectorAll('.player-input-wrap');
+      if (wraps.length <= MIN_PLAYERS) return; // keep at least 2
+      const wrap = playerInputs.querySelector(`[data-index="${index}"]`);
+      if (wrap) {
+        wrap.remove();
+        playerCount--;
+        // Re-index remaining inputs so labels stay sequential
+        reindexInputs();
+        updateAddButton();
+        updateStartButton();
+      }
+    }
+
+    function reindexInputs() {
+      const wraps = playerInputs.querySelectorAll('.player-input-wrap');
+      wraps.forEach((wrap, i) => {
+        wrap.dataset.index = i;
+        wrap.querySelector('label').textContent = `#${i + 1}`;
+        const input = wrap.querySelector('.pname-input');
+        input.id = `pname-${i}`;
+        input.placeholder = `Player ${i + 1}`;
+        wrap.querySelector('.btn-remove').dataset.index = i;
+      });
+      playerCount = wraps.length;
+    }
+
+    function updateAddButton() {
+      btnAddPlayer.disabled = playerCount >= MAX_PLAYERS;
+    }
+
+    function updateStartButton() {
+      const names = getPlayerNames();
+      const valid = names.length >= MIN_PLAYERS && names.every(n => n.trim().length > 0);
+      btnStartGame.disabled = !valid;
+      setupError.textContent = '';
+    }
+
+    function getPlayerNames() {
+      const inputs = playerInputs.querySelectorAll('.pname-input');
+      return Array.from(inputs).map(inp => inp.value.trim()).filter(n => n.length > 0);
+    }
+
+    function validateSetup() {
+      const names = getPlayerNames();
+      if (names.length < MIN_PLAYERS) {
+        setupError.textContent = `At least ${MIN_PLAYERS} players are required.`;
+        return null;
+      }
+      const empty = Array.from(playerInputs.querySelectorAll('.pname-input'))
+                        .some(inp => inp.value.trim().length === 0);
+      if (empty) {
+        setupError.textContent = 'All player names must be filled in.';
+        return null;
+      }
+      setupError.textContent = '';
+      return names;
+    }
+
+    // Initialize with 2 empty inputs
+    addPlayerInput('');
+    addPlayerInput('');
+
+    btnAddPlayer.addEventListener('click', () => {
+      addPlayerInput('');
+      // Focus the new input
+      const inputs = playerInputs.querySelectorAll('.pname-input');
+      inputs[inputs.length - 1].focus();
+    });
+
+    btnStartGame.addEventListener('click', () => {
+      const names = validateSetup();
+      if (!names) return;
+      startNewGame(names);
+    });
   </script>
 </body>
 </html>

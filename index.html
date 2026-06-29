@@ -459,9 +459,80 @@
   }
 
   /* =========================================================
-     Screen 3 — Results (placeholder)
+     Screen 3 — Results
      ========================================================= */
-  /* Filled in Task 6 */
+  .results-container {
+    max-width: 500px;
+    margin: 40px auto;
+    text-align: center;
+  }
+
+  .results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 28px 0;
+    text-align: left;
+  }
+
+  .result-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 10px;
+    padding: 14px 18px;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s;
+  }
+
+  .result-row:hover {
+    transform: translateX(4px);
+  }
+
+  .result-rank {
+    font-weight: 900;
+    font-size: 1.1rem;
+    min-width: 32px;
+    color: var(--text);
+    opacity: 0.5;
+  }
+
+  .result-name {
+    flex: 1;
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+
+  .result-score {
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: var(--header);
+  }
+
+  /* Winner styling */
+  .result-row--winner {
+    background: linear-gradient(135deg, rgba(175, 157, 71, 0.15), rgba(175, 157, 71, 0.05));
+    border: 2px solid var(--gold);
+    transform: scale(1.02);
+  }
+
+  .result-row--winner:hover {
+    transform: scale(1.02) translateX(4px);
+  }
+
+  .result-row--winner .result-rank::before {
+    content: '\1F3C6'; /* trophy emoji */
+    margin-right: 4px;
+  }
+
+  .result-row--winner .result-name {
+    color: var(--gold);
+  }
+
+  .result-row--winner .result-score {
+    color: var(--gold);
+  }
 
   /* =========================================================
      SVG Background — Flowing Bezier Curves
@@ -571,7 +642,17 @@
 
     <!-- Screen 3: Results -->
     <div id="screen-results" class="screen">
-      <!-- Filled in Task 6 -->
+      <div class="results-container">
+        <div class="uno-badge">
+          <span class="uno-badge__text">FINAL SCORES</span>
+        </div>
+
+        <div id="results-list" class="results-list">
+          <!-- Rendered by JS -->
+        </div>
+
+        <button id="btn-new-game" class="btn btn--primary">New Game</button>
+      </div>
     </div>
   </div>
 
@@ -965,6 +1046,51 @@
       div.appendChild(document.createTextNode(text));
       return div.innerHTML;
     }
+
+    // =========================================================
+    // Results
+    // =========================================================
+    const resultsList = $('results-list');
+    const btnNewGame  = $('btn-new-game');
+
+    function renderResults() {
+      if (!state.players || state.players.length === 0) return;
+
+      // Calculate totals and sort
+      const ranked = state.players.map((p, i) => ({
+        name: p.name,
+        total: p.scores.reduce((sum, s) => sum + (s !== null ? s : 0), 0),
+        index: i
+      })).sort((a, b) => a.total - b.total); // ascending — lower is better in golf
+
+      const minTotal = ranked[0].total;
+
+      resultsList.innerHTML = '';
+      ranked.forEach((player, rank) => {
+        const isWinner = player.total === minTotal;
+        const row = document.createElement('div');
+        row.className = `result-row${isWinner ? ' result-row--winner' : ''}`;
+        row.innerHTML = `
+          <span class="result-rank">${isWinner ? '' : `#${rank + 1}`}</span>
+          <span class="result-name">${escapeHtml(player.name)}</span>
+          <span class="result-score">${player.total}</span>
+        `;
+        resultsList.appendChild(row);
+      });
+    }
+
+    btnNewGame.addEventListener('click', () => {
+      state = { players: [], currentRound: 1, gameActive: false };
+      // Reset setup inputs
+      playerInputs.innerHTML = '';
+      playerCount = 0;
+      addPlayerInput('');
+      addPlayerInput('');
+      updateAddButton();
+      updateStartButton();
+      setupError.textContent = '';
+      showScreen('screen-setup');
+    });
   </script>
 </body>
 </html>

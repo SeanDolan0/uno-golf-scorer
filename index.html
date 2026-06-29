@@ -798,11 +798,6 @@
       playerInputs.appendChild(wrap);
       playerCount++;
 
-      // Wire up remove
-      wrap.querySelector('.btn-remove').addEventListener('click', () => {
-        removePlayerInput(idx);
-      });
-
       // Wire up input change to re-validate
       wrap.querySelector('.pname-input').addEventListener('input', updateStartButton);
 
@@ -868,6 +863,14 @@
       setupError.textContent = '';
       return names;
     }
+
+    // Delegated remove-button handler (avoids stale closures after reindex)
+    playerInputs.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn-remove');
+      if (!btn) return;
+      const wrap = btn.closest('.player-input-wrap');
+      if (wrap) removePlayerInput(parseInt(wrap.dataset.index, 10));
+    });
 
     // Initialize with 2 empty inputs
     addPlayerInput('');

@@ -458,6 +458,17 @@
     min-width: 180px;
   }
 
+  .storage-warn {
+    background: rgba(180, 45, 42, 0.1);
+    border: 1px solid var(--red);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: var(--red);
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
   /* =========================================================
      Screen 3 — Results
      ========================================================= */
@@ -549,9 +560,92 @@
   }
 
   /* =========================================================
-     Mobile Responsive (placeholder)
+     Mobile Responsive (max-width: 599px)
      ========================================================= */
-  /* Filled in Task 7 */
+  @media (max-width: 599px) {
+    .container {
+      padding: 12px;
+    }
+
+    /* UNO badge scales down */
+    .uno-badge {
+      padding: 10px 20px;
+      border-radius: 40px / 28px;
+    }
+
+    .uno-badge__text {
+      font-size: 1.1rem;
+    }
+
+    /* Setup inputs stack naturally (already flex column) */
+    .setup-container {
+      margin: 20px auto;
+    }
+
+    .setup-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .setup-actions .btn {
+      width: 100%;
+    }
+
+    /* Scorecard — sticky player column + horizontal scroll */
+    .scorecard-header {
+      flex-wrap: wrap;
+      padding: 10px 12px;
+    }
+
+    .scorecard-header__center {
+      order: 3;
+      width: 100%;
+    }
+
+    .round-title {
+      font-size: 1rem;
+    }
+
+    .scorecard-table-wrap {
+      margin: 0 -12px 20px;
+      border-radius: 0;
+    }
+
+    .scorecard-table tbody td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      min-width: 80px;
+    }
+
+    .score-cell {
+      width: 38px;
+      height: 38px;
+      font-size: 0.9rem;
+    }
+
+    /* Score entry inputs stack vertically */
+    .score-entry__inputs {
+      grid-template-columns: 1fr;
+    }
+
+    /* Results */
+    .results-container {
+      margin: 20px auto;
+    }
+
+    .result-row {
+      padding: 12px 14px;
+    }
+
+    .result-row--winner {
+      transform: scale(1.01);
+    }
+
+    .result-row--winner:hover {
+      transform: scale(1.01) translateX(4px);
+    }
+  }
 </style>
 </head>
 <body>
@@ -829,22 +923,19 @@
     // localStorage Persistence
     // =========================================================
     function saveGame() {
+      if (!storageAvailable) return;
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch (e) {
-        // localStorage full or unavailable — fail silently
-      }
+      } catch (e) { /* ignore */ }
     }
 
     function loadSavedGame() {
+      if (!storageAvailable) return null;
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return null;
         const parsed = JSON.parse(raw);
-        // Basic validation
-        if (!parsed || !parsed.players || !parsed.currentRound || !parsed.gameActive) {
-          return null;
-        }
+        if (!parsed || !parsed.players || !parsed.currentRound || !parsed.gameActive) return null;
         return parsed;
       } catch (e) {
         return null;
@@ -852,16 +943,27 @@
     }
 
     function clearSavedGame() {
+      if (!storageAvailable) return;
       try {
         localStorage.removeItem(STORAGE_KEY);
       } catch (e) { /* ignore */ }
     }
 
-    // Check localStorage warning
+    // Check localStorage availability and set up fallback
+    let storageAvailable = true;
     try {
-      localStorage.getItem('__test__');
+      localStorage.setItem('__test__', '1');
+      localStorage.removeItem('__test__');
     } catch (e) {
-      console.warn('localStorage is not available. Scores will not persist across page reloads.');
+      storageAvailable = false;
+      console.warn('localStorage unavailable — scores will not persist across reloads.');
+    }
+
+    if (!storageAvailable) {
+      const warn = document.createElement('div');
+      warn.className = 'storage-warn';
+      warn.textContent = 'Warning: localStorage is unavailable. Scores will not persist if you close or reload the page.';
+      document.querySelector('.container').prepend(warn);
     }
 
     // =========================================================
@@ -1046,6 +1148,20 @@
       div.appendChild(document.createTextNode(text));
       return div.innerHTML;
     }
+
+    // Allow Enter key to advance through score inputs and submit
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && document.activeElement?.classList.contains('score-input')) {
+        e.preventDefault();
+        const inputs = [...scoreEntryInputs.querySelectorAll('.score-input')];
+        const idx = inputs.indexOf(document.activeElement);
+        if (idx < inputs.length - 1) {
+          inputs[idx + 1].focus();
+        } else {
+          btnRecordScores.click();
+        }
+      }
+    });
 
     // =========================================================
     // Results

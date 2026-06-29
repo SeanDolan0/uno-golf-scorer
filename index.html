@@ -208,9 +208,255 @@
   }
 
   /* =========================================================
-     Screen 2 — Scorecard (placeholder)
+     Screen 2 — Scorecard
      ========================================================= */
-  /* Filled in Task 5 */
+  .scorecard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--header);
+    border-radius: 12px;
+    padding: 12px 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .uno-badge--small {
+    padding: 6px 16px;
+    border-width: 2px;
+    border-radius: 40px / 28px;
+    margin-bottom: 0;
+  }
+
+  .uno-badge--small .uno-badge__text {
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+  }
+
+  .scorecard-header__center {
+    text-align: center;
+    flex: 1;
+  }
+
+  .round-title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .round-dots {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  .round-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transition: background 0.2s;
+  }
+
+  .round-dot--active {
+    background: #fff;
+  }
+
+  .round-dot--past {
+    background: rgba(255,255,255,0.6);
+  }
+
+  .btn--danger {
+    background: var(--red);
+    color: #fff;
+  }
+
+  .btn--danger:hover {
+    background: #9e2826;
+  }
+
+  /* =========================================================
+     Scorecard Table
+     ========================================================= */
+  .scorecard-table-wrap {
+    overflow-x: auto;
+    margin-bottom: 24px;
+    border-radius: 8px;
+  }
+
+  .scorecard-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: transparent;
+    min-width: 600px;
+  }
+
+  .scorecard-table th,
+  .scorecard-table td {
+    padding: 10px 8px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .scorecard-table thead th {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    background: rgba(196, 187, 179, 0.6);
+    border-bottom: 2px solid var(--olive);
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  .scorecard-table thead th:first-child {
+    text-align: left;
+    padding-left: 12px;
+  }
+
+  /* player name cell (first column) */
+  .scorecard-table tbody td:first-child {
+    font-weight: 700;
+    text-align: left;
+    padding-left: 12px;
+    color: var(--text);
+    background: var(--bg);
+    position: sticky;
+    left: 0;
+    z-index: 1;
+  }
+
+  /* Alternate row shading */
+  .scorecard-table tbody tr:nth-child(even) td {
+    background-color: rgba(255,255,255,0.35);
+  }
+  .scorecard-table tbody tr:nth-child(even) td:first-child {
+    background-color: rgba(196, 187, 179, 0.85);
+  }
+
+  /* UNO card score cells */
+  .score-cell {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: var(--card-bg);
+    border-radius: var(--card-radius);
+    box-shadow: var(--shadow);
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--text);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .score-cell:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+  }
+
+  /* Current round column highlight */
+  .scorecard-table .col-current .score-cell {
+    border: 2px solid var(--steel);
+    box-shadow: 0 0 0 3px rgba(140, 171, 209, 0.25);
+  }
+
+  /* Total column */
+  .scorecard-table td:last-child {
+    font-weight: 800;
+    font-size: 1.1rem;
+    border-left: 2px solid var(--olive);
+    background: rgba(175, 157, 71, 0.08);
+  }
+
+  .scorecard-table tbody tr:nth-child(even) td:last-child {
+    background: rgba(175, 157, 71, 0.12);
+  }
+
+  /* Leader glow on total */
+  .leader-glow td:last-child {
+    color: var(--header);
+    position: relative;
+  }
+
+  .leader-glow td:last-child::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(83, 119, 95, 0.15), transparent 70%);
+    pointer-events: none;
+  }
+
+  /* =========================================================
+     Score Entry Section
+     ========================================================= */
+  .score-entry {
+    background: rgba(255,255,255,0.5);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .score-entry__title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--header);
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .score-entry__inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .score-entry__input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .score-entry__input-group label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text);
+    opacity: 0.7;
+  }
+
+  .score-entry__input-group input {
+    padding: 10px 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    border: 2px solid var(--olive);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--text);
+    outline: none;
+    width: 100%;
+    font-family: var(--font-body);
+    transition: border-color 0.15s;
+  }
+
+  .score-entry__input-group input:focus {
+    border-color: var(--steel);
+    box-shadow: 0 0 0 3px rgba(140, 171, 209, 0.3);
+  }
+
+  .btn--record {
+    display: block;
+    margin: 0 auto;
+    min-width: 180px;
+  }
 
   /* =========================================================
      Screen 3 — Results (placeholder)
@@ -290,7 +536,37 @@
 
     <!-- Screen 2: Scorecard -->
     <div id="screen-scorecard" class="screen">
-      <!-- Filled in Task 5 -->
+      <!-- Header -->
+      <header class="scorecard-header">
+        <div class="scorecard-header__left">
+          <div class="uno-badge uno-badge--small">
+            <span class="uno-badge__text">UNO GOLF</span>
+          </div>
+        </div>
+        <div class="scorecard-header__center">
+          <h2 id="round-title" class="round-title">Round 1 of 9</h2>
+          <div id="round-dots" class="round-dots"></div>
+        </div>
+        <div class="scorecard-header__right">
+          <button id="btn-end-game" class="btn btn--danger">End Game</button>
+        </div>
+      </header>
+
+      <!-- Scorecard Table -->
+      <div class="scorecard-table-wrap">
+        <table id="scorecard-table" class="scorecard-table">
+          <thead id="scorecard-thead"></thead>
+          <tbody id="scorecard-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- Score Entry -->
+      <div id="score-entry" class="score-entry">
+        <h3 class="score-entry__title">Enter Round <span id="entry-round-num">1</span> Scores</h3>
+        <div id="score-entry-inputs" class="score-entry__inputs"></div>
+        <button id="btn-record-scores" class="btn btn--primary btn--record">Record Scores</button>
+        <p id="entry-error" class="setup-error"></p>
+      </div>
     </div>
 
     <!-- Screen 3: Results -->
@@ -527,6 +803,168 @@
         }
       }
     })();
+
+    // =========================================================
+    // DOM Refs — Scorecard
+    // =========================================================
+    const scorecardThead = $('scorecard-thead');
+    const scorecardTbody = $('scorecard-tbody');
+    const roundTitle     = $('round-title');
+    const roundDots      = $('round-dots');
+    const entryRoundNum  = $('entry-round-num');
+    const scoreEntryInputs = $('score-entry-inputs');
+    const btnRecordScores = $('btn-record-scores');
+    const entryError     = $('entry-error');
+    const btnEndGame     = $('btn-end-game');
+
+    // =========================================================
+    // Render Scorecard
+    // =========================================================
+    function renderScorecard() {
+      if (!state.players || state.players.length === 0) return;
+
+      // Update round title
+      roundTitle.textContent = `Round ${state.currentRound} of ${TOTAL_ROUNDS}`;
+      entryRoundNum.textContent = state.currentRound;
+
+      // Render round dots
+      renderRoundDots();
+
+      // Render table header
+      let theadHtml = '<tr><th>Player</th>';
+      for (let r = 1; r <= TOTAL_ROUNDS; r++) {
+        const cls = r === state.currentRound ? 'class="col-current"' : '';
+        theadHtml += `<th ${cls}>${r}</th>`;
+      }
+      theadHtml += '<th>Total</th></tr>';
+      scorecardThead.innerHTML = theadHtml;
+
+      // Calculate totals
+      const totals = state.players.map(p => {
+        return p.scores.reduce((sum, s) => sum + (s !== null ? s : 0), 0);
+      });
+      const minTotal = Math.min(...totals);
+
+      // Render table body
+      let tbodyHtml = '';
+      state.players.forEach((player, pi) => {
+        const isLeader = totals[pi] === minTotal;
+        const leaderCls = isLeader ? ' class="leader-glow"' : '';
+        tbodyHtml += `<tr${leaderCls}>`;
+        tbodyHtml += `<td>${escapeHtml(player.name)}</td>`;
+        for (let r = 0; r < TOTAL_ROUNDS; r++) {
+          const score = player.scores[r];
+          const isCurrent = (r + 1) === state.currentRound;
+          const scoreDisplay = score !== null ? score : '-';
+          const cellCls = isCurrent ? ' class="col-current"' : '';
+          tbodyHtml += `<td${cellCls}><span class="score-cell">${scoreDisplay}</span></td>`;
+        }
+        tbodyHtml += `<td>${totals[pi]}</td>`;
+        tbodyHtml += `</tr>`;
+      });
+      scorecardTbody.innerHTML = tbodyHtml;
+
+      // Render score entry inputs
+      renderScoreEntry();
+    }
+
+    function renderRoundDots() {
+      roundDots.innerHTML = '';
+      for (let r = 1; r <= TOTAL_ROUNDS; r++) {
+        const dot = document.createElement('span');
+        dot.className = 'round-dot';
+        if (r === state.currentRound) dot.classList.add('round-dot--active');
+        else if (r < state.currentRound) dot.classList.add('round-dot--past');
+        roundDots.appendChild(dot);
+      }
+    }
+
+    function renderScoreEntry() {
+      scoreEntryInputs.innerHTML = '';
+      state.players.forEach((player, pi) => {
+        const group = document.createElement('div');
+        group.className = 'score-entry__input-group';
+        const existingScore = player.scores[state.currentRound - 1];
+        const inputId = `score-${pi}`;
+        group.innerHTML = `
+          <label for="${inputId}">${escapeHtml(player.name)}</label>
+          <input type="number" id="${inputId}" class="score-input"
+                 min="0" max="999" placeholder="0"
+                 value="${existingScore !== null ? existingScore : ''}"
+                 autocomplete="off">
+        `;
+        scoreEntryInputs.appendChild(group);
+      });
+      entryError.textContent = '';
+
+      // Focus first input
+      const firstInput = scoreEntryInputs.querySelector('.score-input');
+      if (firstInput) firstInput.focus();
+    }
+
+    // =========================================================
+    // Record Scores
+    // =========================================================
+    btnRecordScores.addEventListener('click', () => {
+      const inputs = scoreEntryInputs.querySelectorAll('.score-input');
+      const roundIdx = state.currentRound - 1;
+
+      // Validate
+      let valid = true;
+      inputs.forEach((inp, pi) => {
+        const val = inp.value.trim();
+        if (val === '') {
+          valid = false;
+          inp.style.borderColor = 'var(--red)';
+        } else {
+          inp.style.borderColor = '';
+          const num = parseInt(val, 10);
+          if (isNaN(num) || num < 0) {
+            valid = false;
+            inp.style.borderColor = 'var(--red)';
+          } else {
+            state.players[pi].scores[roundIdx] = num;
+          }
+        }
+      });
+
+      if (!valid) {
+        entryError.textContent = 'Enter a valid score (0 or higher) for each player.';
+        return;
+      }
+
+      entryError.textContent = '';
+
+      // Advance or end game
+      if (state.currentRound >= TOTAL_ROUNDS) {
+        // Game complete
+        state.gameActive = false;
+        saveGame();
+        clearSavedGame();
+        showScreen('screen-results');
+        renderResults();
+      } else {
+        state.currentRound++;
+        saveGame();
+        renderScorecard();
+      }
+    });
+
+    // End Game early
+    btnEndGame.addEventListener('click', () => {
+      if (confirm('End the current game? All progress will be lost.')) {
+        endGame();
+      }
+    });
+
+    // =========================================================
+    // Utilities
+    // =========================================================
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(text));
+      return div.innerHTML;
+    }
   </script>
 </body>
 </html>

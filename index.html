@@ -434,6 +434,99 @@
       if (!names) return;
       startNewGame(names);
     });
+
+    // =========================================================
+    // Screen Management
+    // =========================================================
+    function showScreen(id) {
+      [screenSetup, screenScorecard, screenResults].forEach(el => {
+        el.classList.toggle('screen--active', el.id === id);
+      });
+    }
+
+    // =========================================================
+    // Game Lifecycle
+    // =========================================================
+    function startNewGame(names) {
+      state = {
+        players: names.map(name => ({
+          name: name,
+          scores: Array(TOTAL_ROUNDS).fill(null)
+        })),
+        currentRound: 1,
+        gameActive: true
+      };
+      saveGame();
+      renderScorecard();
+      showScreen('screen-scorecard');
+    }
+
+    function endGame() {
+      state.gameActive = false;
+      clearSavedGame();
+      showScreen('screen-results');
+      renderResults();
+    }
+
+    // =========================================================
+    // localStorage Persistence
+    // =========================================================
+    function saveGame() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        // localStorage full or unavailable — fail silently
+      }
+    }
+
+    function loadSavedGame() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        // Basic validation
+        if (!parsed || !parsed.players || !parsed.currentRound || !parsed.gameActive) {
+          return null;
+        }
+        return parsed;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function clearSavedGame() {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch (e) { /* ignore */ }
+    }
+
+    // Check localStorage warning
+    try {
+      localStorage.getItem('__test__');
+    } catch (e) {
+      console.warn('localStorage is not available. Scores will not persist across page reloads.');
+    }
+
+    // =========================================================
+    // On Load — Check for Saved Game
+    // =========================================================
+    (function init() {
+      const saved = loadSavedGame();
+      if (saved) {
+        // Prompt user to resume or start fresh
+        const resume = confirm(
+          `You have an unfinished game in progress (Round ${saved.currentRound} of ${TOTAL_ROUNDS}).\n\n` +
+          'Press OK to continue where you left off, or Cancel to start a new game.'
+        );
+        if (resume) {
+          state = saved;
+          renderScorecard();
+          showScreen('screen-scorecard');
+        } else {
+          clearSavedGame();
+        }
+      }
+    })();
   </script>
 </body>
 </html>

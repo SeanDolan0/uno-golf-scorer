@@ -25,7 +25,7 @@ A single-file HTML scorekeeping web app for the Mattel card game **Uno Golf**. T
 
 ### Live Demo
 
-Play it on GitHub Pages: `https://SeanDolan0.github.io/uno-golf-scorer` (after deploying)
+Play it on GitHub Pages: `https://SeanDolan0.github.io/uno-golf-scorer`
 
 ## Color Palette
 

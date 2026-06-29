@@ -25,7 +25,7 @@ A single-file HTML scorekeeping web app for the Mattel card game **Uno Golf**. T
 
 ### Live Demo
 
-Play it on GitHub Pages: `https://<your-username>.github.io/uno-golf-scorer` (after deploying)
+Play it on GitHub Pages: `https://SeanDolan0.github.io/uno-golf-scorer` (after deploying)
 
 ## Color Palette
 
@@ -46,7 +46,7 @@ This is a single-file application — just `index.html`. Open it, edit it, ship 
 
 ```bash
 # Clone the repo
-git clone https://github.com/<your-username>/uno-golf-scorer.git
+git clone https://github.com/SeanDolan0/uno-golf-scorer.git
 cd uno-golf-scorer
 
 # No build step — open directly in your browser
